@@ -14,8 +14,8 @@ from linebot.exceptions import (
 from linebot.models import *
 
 app = Flask(__name__)
-line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')
-handler = WebhookHandler('YOUR_CHANNEL_SECRET')
+line_bot_api = LineBotApi('oBLqNYhbegE4VNz33I5LuYCktLz+m4cRzMPcy+whc7H6L6624HhZsy6W4uXCRKDMdQ4Jqn3kWO+pnyZckWx63M0ZkwNes4HaLtbtGJO9+EIcON6Wdd9y/T9/VxubVc2V/4XAiN+YxAc7Uq2TvDxhrwdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('e019f3c702a1904e332e02b0a7a03708')
 
 picture = ["https://i.imgur.com/qKkE2bj.jpg",
            "https://i.imgur.com/QjMLPmx.jpg",
