@@ -1,3 +1,5 @@
+import os
+import sys
 import requests
 import re
 import random
@@ -14,8 +16,17 @@ from linebot.exceptions import (
 from linebot.models import *
 
 app = Flask(__name__)
-line_bot_api = LineBotApi('oBLqNYhbegE4VNz33I5LuYCktLz+m4cRzMPcy+whc7H6L6624HhZsy6W4uXCRKDMdQ4Jqn3kWO+pnyZckWx63M0ZkwNes4HaLtbtGJO9+EIcON6Wdd9y/T9/VxubVc2V/4XAiN+YxAc7Uq2TvDxhrwdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('e019f3c702a1904e332e02b0a7a03708')
+
+channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
+channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
+if channel_secret is None:
+    print('Specify LINE_CHANNEL_SECRET as environment variable.')
+    sys.exit(1)
+if channel_access_token is None:
+    print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
+    sys.exit(1)
+line_bot_api = LineBotApi(channel_access_token)
+parser = WebhookParser(channel_secret)
 
 picture = ["https://i.imgur.com/qKkE2bj.jpg",
            "https://i.imgur.com/QjMLPmx.jpg",
