@@ -372,8 +372,8 @@ def getMenu():
         content += data
     if os.path.isfile(file_path):
         content += 'ooo'
-        #with open("123.csv", "r") as f:
-            #line = f.readline().strip()
+        with open("123.txt", "r") as f:
+            line = f.readline().strip()
             
     else:
         content += 'xxx'
@@ -393,14 +393,14 @@ def getMenu():
             #print(r.no, r.item, r.price)
             data = r.no +' '+ r.item +' '+ r.price + '\n'
             #content += data
-    '''
+    
     with open('123.txt', "r") as f:
         while True:
             line = f.readline().strip()
             if not line:
                 break
             content += line
-    
+    '''
     return content
 
 @handler.add(MessageEvent, message=TextMessage)
