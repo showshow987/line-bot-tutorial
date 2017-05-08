@@ -367,13 +367,16 @@ def getMenu():
     print(os.path.join(PROJECT_ROOT, "menu", "123.csv"))
     file = os.path.join(PROJECT_ROOT, "menu", "123.csv")
     content = file + '\n'
+    for filename in os.listdir(PROJECT_ROOT):
+        content += '1'
+    '''
     for dirPath, dirNames, fileNames in os.walk(PROJECT_ROOT):
         #print dirPath
         for f in fileNames:
             data = os.path.join(dirPath, f) + '\n'
             content += '1'#data
             #print os.path.join(dirPath, f)
-    '''
+    
     with open(file, "r") as f:
         f_csv = csv.reader(f)
         headings = next(f_csv)
