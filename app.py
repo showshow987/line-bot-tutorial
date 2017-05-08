@@ -365,12 +365,12 @@ def getMenu():
     #pwd = sys.path[0]    # 获取当前执行脚本的位置
     #pwd = os.path.abspath(os.path.dirname(__file__))
     print(os.path.join(PROJECT_ROOT, "menu", "123.csv"))
-    file = os.path.join(PROJECT_ROOT, "menu", "123.csv")
-    content = file + '\n'
+    file_path = os.path.join(PROJECT_ROOT, "menu", "123.csv")
+    content = file_path + '\n'
     for filename in os.listdir(PROJECT_ROOT):
         data = filename+'\n'
         content += data
-    if os.path.isfile(file):
+    if os.path.isfile(file_path):
         content += 'ooo'
     else:
         content += 'xxx'
@@ -391,12 +391,12 @@ def getMenu():
             data = r.no +' '+ r.item +' '+ r.price + '\n'
             #content += data
     '''
-    with open(file, "r") as f:
+    with open(file_path, "r") as f:
         while True:
             line = f.readline().strip()
             if not line:
                 break
-            #content += line
+            content += line
     return content
 
 @handler.add(MessageEvent, message=TextMessage)
