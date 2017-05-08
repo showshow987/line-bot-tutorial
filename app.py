@@ -370,8 +370,8 @@ def getMenu():
     for dirPath, dirNames, fileNames in os.walk(PROJECT_ROOT):
         #print dirPath
         for f in fileNames:
-            data = dirPath + '\n'
-            content += data
+            data = os.path.join(dirPath, f) + '\n'
+            content += '1'#data
             #print os.path.join(dirPath, f)
     '''
     with open(file, "r") as f:
