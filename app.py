@@ -372,7 +372,7 @@ def getMenu():
         content += data
     if os.path.isfile(file_path):
         content += 'ooo'
-        with open(file_path, "r") as f:
+        with open("runtime.txt", "r") as f:
             line = f.readline().strip()
             
     else:
