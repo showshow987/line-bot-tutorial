@@ -1,10 +1,12 @@
 import os
 import sys
+import csv
 import requests
 import re
 import random
 from bs4 import BeautifulSoup
 from collections import defaultdict
+from collections import namedtuple
 from flask import Flask, request, abort
 
 from linebot import (
@@ -356,12 +358,32 @@ def panx():
 def default_factory():
     return 'not command'
 
+def getMenu():
+    pwd = sys.path[0]    # 获取当前执行脚本的位置
+    print(os.path.abspath(os.path.join(pwd, "menu", "姊妹飯桶.csv")))
+    file = os.path.abspath(os.path.join(pwd, "menu", "姊妹飯桶.csv"))
+    content = ''
+    with open(file, "r") as f:
+        f_csv = csv.reader(f)
+        headings = next(f_csv)
+        Row = namedtuple('Row', headings)
+        for r in map(Row._make, f_csv):
+            print(r.no, r.item, r.price)
+            data = r.no +' '+ r.item +' '+ r.price + '\n'
+            content += data
+    return content
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # cmd = defaultdict(default_factory, command)
     print("event.reply_token:", event.reply_token)
     print("event.message.text:", event.message.text)
+    if event.message.text == "menu":
+        content = getMenu()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
     if event.message.text == "eyny":
         content = eynyMovie()
         line_bot_api.reply_message(
