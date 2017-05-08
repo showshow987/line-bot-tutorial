@@ -359,11 +359,12 @@ def default_factory():
     return 'not command'
 
 def getMenu():
-    pwd = sys.path[0]    # 获取当前执行脚本的位置
-    #print(os.path.abspath(os.path.join(pwd, "menu", "123.csv")))
-    #file = os.path.abspath(os.path.join(pwd, "menu", "123.csv"))
+    #pwd = sys.path[0]    # 获取当前执行脚本的位置
+    pwd = os.path.abspath(os.path.dirname(__file__))
+    print(os.path.abspath(os.path.join(pwd, "menu", "123.csv")))
+    file = os.path.abspath(os.path.join(pwd, "menu", "123.csv"))
     content = 'x'
-    '''
+    
     with open(file, "r") as f:
         f_csv = csv.reader(f)
         headings = next(f_csv)
@@ -372,7 +373,7 @@ def getMenu():
             print(r.no, r.item, r.price)
             data = r.no +' '+ r.item +' '+ r.price + '\n'
             content += data
-    '''
+    
     return content
 
 @handler.add(MessageEvent, message=TextMessage)
