@@ -30,6 +30,9 @@ if channel_access_token is None:
 handler = WebhookHandler(channel_secret)
 line_bot_api = LineBotApi(channel_access_token)
 
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 picture = ["https://i.imgur.com/qKkE2bj.jpg",
            "https://i.imgur.com/QjMLPmx.jpg",
            "https://i.imgur.com/HefBo5o.jpg",
@@ -360,9 +363,9 @@ def default_factory():
 
 def getMenu():
     #pwd = sys.path[0]    # 获取当前执行脚本的位置
-    pwd = os.path.abspath(os.path.dirname(__file__))
-    print(os.path.abspath(os.path.join(pwd, "menu", "123.csv")))
-    file = os.path.abspath(os.path.join(pwd, "menu", "123.csv"))
+    #pwd = os.path.abspath(os.path.dirname(__file__))
+    print(os.path.join(PROJECT_ROOT, "menu", "123.csv"))
+    file = os.path.join(PROJECT_ROOT, "menu", "123.csv")
     content = 'x'
     
     with open(file, "r") as f:
