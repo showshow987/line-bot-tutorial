@@ -381,7 +381,7 @@ def getMenu():
             data = os.path.join(dirPath, f) + '\n'
             content += '1'#data
             #print os.path.join(dirPath, f)
-    
+    '''
     with open(file, "r") as f:
         f_csv = csv.reader(f)
         headings = next(f_csv)
@@ -390,7 +390,7 @@ def getMenu():
             print(r.no, r.item, r.price)
             data = r.no +' '+ r.item +' '+ r.price + '\n'
             content += data
-    '''
+    
     return content
 
 @handler.add(MessageEvent, message=TextMessage)
