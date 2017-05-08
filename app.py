@@ -396,7 +396,7 @@ def getMenu():
             line = f.readline().strip()
             if not line:
                 break
-            content += line
+            #content += line
     return content
 
 @handler.add(MessageEvent, message=TextMessage)
