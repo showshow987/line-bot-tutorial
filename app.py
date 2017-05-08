@@ -372,8 +372,8 @@ def getMenu():
         content += data
     if os.path.isfile(file_path):
         content += 'ooo'
-        with open("123.csv", "r") as f:
-            line = f.readline().strip()
+        #with open("123.csv", "r") as f:
+            #line = f.readline().strip()
             
     else:
         content += 'xxx'
