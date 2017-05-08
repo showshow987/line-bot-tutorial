@@ -377,6 +377,7 @@ def getMenu():
                 line = f.readline().strip()
                 if not line:
                     break
+                content += line
             
     else:
         content += 'xxx'
