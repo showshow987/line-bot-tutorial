@@ -392,9 +392,14 @@ def handle_message(event):
     print("event.message.text:", event.message.text)
     if event.message.text == "menu":
         content = getMenu()
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=content))
+        try:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=content))
+        except LineBotApiError as e:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text='xxxxxxxx'))
         return 0
     if event.message.text == "eyny":
         content = eynyMovie()
