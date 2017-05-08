@@ -387,9 +387,9 @@ def getMenu():
         headings = next(f_csv)
         Row = namedtuple('Row', headings)
         for r in map(Row._make, f_csv):
-            print(r.no, r.item, r.price)
+            #print(r.no, r.item, r.price)
             data = r.no +' '+ r.item +' '+ r.price + '\n'
-            content += data
+            #content += data
     
     return content
 
