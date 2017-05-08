@@ -370,6 +370,10 @@ def getMenu():
     for filename in os.listdir(PROJECT_ROOT):
         data = filename+'\n'
         content += data
+    if os.path.isfile(file):
+        content += 'ooo'
+    else:
+        content += 'xxx'
     '''
     for dirPath, dirNames, fileNames in os.walk(PROJECT_ROOT):
         #print dirPath
