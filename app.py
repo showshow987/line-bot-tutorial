@@ -393,14 +393,14 @@ def getMenu():
             #print(r.no, r.item, r.price)
             data = r.no +' '+ r.item +' '+ r.price + '\n'
             #content += data
-    
-    with open(r'menu/123.csv', "r") as f:
+    '''
+    with open('123.txt', "r") as f:
         while True:
             line = f.readline().strip()
             if not line:
                 break
             content += line
-    '''
+    
     return content
 
 @handler.add(MessageEvent, message=TextMessage)
