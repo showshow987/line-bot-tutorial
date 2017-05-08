@@ -366,8 +366,8 @@ def getMenu():
     #pwd = os.path.abspath(os.path.dirname(__file__))
     print(os.path.join(PROJECT_ROOT, "menu", "123.csv"))
     file = os.path.join(PROJECT_ROOT, "menu", "123.csv")
-    content = 'x'
-    
+    content = file
+    '''
     with open(file, "r") as f:
         f_csv = csv.reader(f)
         headings = next(f_csv)
@@ -376,7 +376,7 @@ def getMenu():
             print(r.no, r.item, r.price)
             data = r.no +' '+ r.item +' '+ r.price + '\n'
             content += data
-    
+    '''
     return content
 
 @handler.add(MessageEvent, message=TextMessage)
