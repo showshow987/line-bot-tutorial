@@ -75,6 +75,7 @@ def create_order_table():
  NAME TEXT NOT NULL,\
  ITEM TEXT NOT NULL,\
  PRICE INT NOT NULL)")
+    conn.commit()
 
 '''
 @app.route('/')
