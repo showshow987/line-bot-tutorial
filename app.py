@@ -70,7 +70,7 @@ def dis_DB():
 def create_order_table():
     global conn, cur
     get_DB()
-    cur.execute("CREATE TABLE IF NOT EXISTS ORDER\
+    cur.execute("CREATE TABLE IF NOT EXISTS ORDERTABLE\
  (ID INT PRIMARY KEY NOT NULL,\
  NAME TEXT NOT NULL,\
  ITEM TEXT NOT NULL,\
