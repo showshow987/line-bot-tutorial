@@ -9,6 +9,8 @@ from collections import defaultdict
 from collections import namedtuple
 from flask import Flask, request, abort
 ############################################fordb
+import psycopg2
+from urllib.parse import urlparse
 '''
 from flask import *
 from datetime import datetime
@@ -26,6 +28,47 @@ from linebot.models import *
 
 app = Flask(__name__)
 ############################################fordb
+database_url = os.getenv('DATABASE_URL', None)
+if database_url is None:
+    print('Specify DATABASE_URL as environment variable.')
+    sys.exit(1)
+url = urlparse(database_url)
+
+conn = cur = None
+
+def conn_DB():
+    global conn, cur
+    try:
+        conn = psycopg2.connect(
+                database=url.path[1:],
+                user=url.username,
+                password=url.password,
+                host=url.hostname,
+                port=url.port
+                )
+        cur = conn.cursor()
+        #db = cur.execute
+    except psycopg2.DatabaseError as con:
+        if con:
+             con.rollback()
+        print(con)
+
+def get_DB():
+    global conn, cur
+    if not (conn and cur):
+        conn_DB()
+    return (conn, cur)
+
+def dis_DB():
+    global conn, cur
+    if conn:
+        conn.close()
+    if cur:
+        cur.close()
+    conn = cur = None
+    
+
+    
 '''
 @app.route('/')
 @app.route('/index')
@@ -42,7 +85,6 @@ def index():
         history_list.append(history_dic)
         history_dic = {}
     return render_template('index.html', **locals())
-
 @app.route('/API/add_data', methods=['POST'])
 def add_data():
     name = request.form['name']
@@ -387,6 +429,26 @@ def handle_message(event):
     # cmd = defaultdict(default_factory, command)
     print("event.reply_token:", event.reply_token)
     print("event.message.text:", event.message.text)
+    if event.message.text == "conn":
+        get_DB()
+        if not (conn and cur):
+            content = "conn fail"
+        else:
+            content = "conn OKKK"
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+    if event.message.text == "dc":
+        dis_DB()
+        if not (conn and cur):
+            content = "disConn ok"
+        else:
+            content = "disConn xx"
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
     if event.message.text == "menu":
         content = getMenu()
         try:
