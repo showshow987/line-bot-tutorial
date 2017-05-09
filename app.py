@@ -66,9 +66,16 @@ def dis_DB():
     if cur:
         cur.close()
     conn = cur = None
-    
 
-    
+def create_order_table():
+    global conn, cur
+    get_DB()
+    cur.execute("CREATE TABLE IF NOT EXISTS ORDER\
+ (ID INT PRIMARY KEY NOT NULL,\
+ NAME TEXT NOT NULL,\
+ ITEM TEXT NOT NULL,\
+ PRICE INT NOT NULL)")
+
 '''
 @app.route('/')
 @app.route('/index')
@@ -445,6 +452,13 @@ def handle_message(event):
             content = "disConn ok"
         else:
             content = "disConn xx"
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+    if event.message.text == "cot":
+        create_order_table()
+        content = "cot Okkk"
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
