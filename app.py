@@ -39,7 +39,7 @@ def index():
         history_list.append(history_dic)
         history_dic = {}
     return render_template('index.html', **locals())
-
+'''
 @app.route('/API/add_data', methods=['POST'])
 def add_data():
     name = request.form['name']
@@ -53,6 +53,7 @@ def add_data():
         db.session.add(add_data)
         db.session.commit()
     return redirect('index')
+'''
 ############################################fordb
 
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
