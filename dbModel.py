@@ -4,8 +4,12 @@ from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
 app = Flask(__name__)
-app.config[
-    'SQLALCHEMY_DATABASE_URI'] = 'postgres://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+database_url = os.getenv('DATABASE_URL', None)
+if database_url is None:
+    print('Specify DATABASE_URL as environment variable.')
+    sys.exit(1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
