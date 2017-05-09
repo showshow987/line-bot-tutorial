@@ -9,9 +9,11 @@ from collections import defaultdict
 from collections import namedtuple
 from flask import Flask, request, abort
 ############################################fordb
+'''
 from flask import *
 from datetime import datetime
 from dbModel import *
+'''
 ############################################fordb
 
 from linebot import (
@@ -24,6 +26,7 @@ from linebot.models import *
 
 app = Flask(__name__)
 ############################################fordb
+'''
 @app.route('/')
 @app.route('/index')
 def index():
@@ -39,7 +42,7 @@ def index():
         history_list.append(history_dic)
         history_dic = {}
     return render_template('index.html', **locals())
-'''
+
 @app.route('/API/add_data', methods=['POST'])
 def add_data():
     name = request.form['name']
