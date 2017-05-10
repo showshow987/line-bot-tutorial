@@ -9,6 +9,8 @@ from collections import defaultdict
 from collections import namedtuple
 from flask import Flask, request, abort
 ############################################fordb
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 import psycopg2
 from urllib.parse import urlparse
 '''
@@ -28,6 +30,35 @@ from linebot.models import *
 
 app = Flask(__name__)
 ############################################fordb
+def auth_gss_client(path, scopes):
+    creds = ServiceAccountCredentials.from_json_keyfile_name(path, scopes)
+    return gspread.authorize(creds)
+
+auth_json_path = 'client_secret.json'
+gss_scopes = ['https://spreadsheets.google.com/feeds']
+
+gss_client = auth_gss_client(auth_json_path, gss_scopes)
+
+#sheet = gss_client.open("Copy of Legislators 2017").sheet1
+sh = gss_client.open_by_key('1nJHriicxQAZj5i_c8bWAY8OShp7OMLErsz6QKIOs36M')
+
+wks = sh.get_worksheet(0)
+
+tRow = None
+
+def get_tRow():
+    global tRow
+    tRow = int(wks.acell('A1').value)
+    return tRow
+
+def add_1Row():
+    global tRow
+    tRow = get_tRow()
+    rowData = [tRow+1, 'aaa', 'bbb', 'ccc']
+    for i in range(len(rowData)):
+        wks.update_cell(tRow+2, i+1, rowData[i])
+        
+'''
 database_url = os.getenv('DATABASE_URL', None)
 if database_url is None:
     print('Specify DATABASE_URL as environment variable.')
@@ -77,7 +108,7 @@ def create_order_table():
  PRICE INT NOT NULL)")
     conn.commit()
 
-'''
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -437,22 +468,16 @@ def handle_message(event):
     # cmd = defaultdict(default_factory, command)
     print("event.reply_token:", event.reply_token)
     print("event.message.text:", event.message.text)
-    if event.message.text == "conn":
-        get_DB()
-        if not (conn and cur):
-            content = "conn fail"
-        else:
-            content = "conn OKKK"
+    if event.message.text == "gtr":
+        get_tRow()
+        content = 'tRow = {}'.format(tRow)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
         return 0
-    if event.message.text == "dc":
-        dis_DB()
-        if not (conn and cur):
-            content = "disConn ok"
-        else:
-            content = "disConn xx"
+    if event.message.text == "add1":
+        add_1Row()
+        content = "add_1Row ok"
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
