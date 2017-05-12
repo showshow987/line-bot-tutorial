@@ -69,7 +69,7 @@ shopList = [x.title for x in wksList[1:]]
 wks = None
 shopSel = None 
 tRow = None
-
+init = 0
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 #PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -94,7 +94,10 @@ def add_1Row():
         wks.update_cell(tRow+2, i+1, rowData[i])
         
 def get_sts():
-    global wksList, wks, pdt, shopSel
+    global wksList, wks, pdt, shopSel, init
+    print(init)
+    init = 1
+    print(init)
     content = 'Status Now: \n\n'
     content+= 'wksList: {}\n'.format(wksList)
     content+= 'wks: {}\n'.format(wks)
