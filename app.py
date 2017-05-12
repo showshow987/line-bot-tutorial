@@ -34,6 +34,7 @@ from linebot.exceptions import (
 )
 from linebot.models import *
 
+###global init___>>>
 app = Flask(__name__)
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
@@ -50,6 +51,35 @@ line_bot_api = LineBotApi(channel_access_token)
 def auth_gss_client(path, scopes):
     creds = ServiceAccountCredentials.from_json_keyfile_name(path, scopes)
     return gspread.authorize(creds)
+
+
+auth_json_path = 'client_secret.json'
+gss_scopes = ['https://spreadsheets.google.com/feeds']
+
+gss_client = auth_gss_client(auth_json_path, gss_scopes)
+###conn to google drive___<<<
+
+#sheet = gss_client.open("Copy of Legislators 2017").sheet1
+sh = gss_client.open_by_key('1nJHriicxQAZj5i_c8bWAY8OShp7OMLErsz6QKIOs36M')
+
+#wks = sh.get_worksheet(0)
+pdt = []
+wksList = sh.worksheets()
+shopList = [x.title for x in wksList[1:]]
+wks = None
+shopSel = None
+tRow = None
+
+#BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+#PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+picture = ["https://i.imgur.com/qKkE2bj.jpg",
+           "https://i.imgur.com/QjMLPmx.jpg",
+           "https://i.imgur.com/HefBo5o.jpg",
+           "https://i.imgur.com/AjxWcuY.jpg"
+           ]
+###global init___<<<
+
 
 def get_tRow():
     global tRow
@@ -105,9 +135,6 @@ def set_shop(dbdShop):
         content = '找不到店家: \"{}\"'.format(shop)
         content+= '\n請輸入店家名稱:'
     return content
-
-###conn to google drive___<<<
-
 
 
 @app.route("/callback", methods=['POST'])
@@ -187,38 +214,6 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, buttons_template)
     return 0
 
-
-"""
-@code start
-"""
-
-###global init___>>>
-
-auth_json_path = 'client_secret.json'
-gss_scopes = ['https://spreadsheets.google.com/feeds']
-
-gss_client = auth_gss_client(auth_json_path, gss_scopes)
-
-#sheet = gss_client.open("Copy of Legislators 2017").sheet1
-sh = gss_client.open_by_key('1nJHriicxQAZj5i_c8bWAY8OShp7OMLErsz6QKIOs36M')
-
-#wks = sh.get_worksheet(0)
-pdt = []
-wksList = sh.worksheets()
-shopList = [x.title for x in wksList[1:]]
-wks = None
-shopSel = None
-tRow = None
-
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
-picture = ["https://i.imgur.com/qKkE2bj.jpg",
-           "https://i.imgur.com/QjMLPmx.jpg",
-           "https://i.imgur.com/HefBo5o.jpg",
-           "https://i.imgur.com/AjxWcuY.jpg"
-           ]
-###global init___<<<
 
 if __name__ == '__main__':
     app.run()
