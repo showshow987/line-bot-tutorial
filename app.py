@@ -37,7 +37,7 @@ from linebot.models import *
 
 ###global init___>>>
 app = Flask(__name__)
-db = redis.from_url(os.getenv('REDIS_URL', None))
+db = redis.from_url(os.getenv('REDIS_URL', None), decode_responses=True)
 
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
@@ -96,7 +96,7 @@ def get_sts():
     content = 'Status Now: \n\n'
     content+= 'wksList: {}\n'.format(wksList)
     content+= 'wks: {}\n'.format(db.get('wks'))
-    content+= 'shopSel: {}\n'.format(db.get('shopSel').decode('big5'))
+    content+= 'shopSel: {}\n'.format(db.get('shopSel'))
     content+= 'pdt: {}\n'.format(db.get('pdt')[:3])
     return content
         
