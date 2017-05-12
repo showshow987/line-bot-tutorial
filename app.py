@@ -34,6 +34,8 @@ from linebot.exceptions import (
 )
 from linebot.models import *
 
+app = Flask(__name__)
+
 ###conn to google drive___>>>
 def auth_gss_client(path, scopes):
     creds = ServiceAccountCredentials.from_json_keyfile_name(path, scopes)
@@ -179,8 +181,6 @@ def handle_message(event):
 """
 @code start
 """
-
-app = Flask(__name__)
 
 ###global init___>>>
 
