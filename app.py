@@ -10,6 +10,7 @@ import csv
 import requests
 import re
 import random
+import redis
 from bs4 import BeautifulSoup
 from collections import defaultdict
 from collections import namedtuple
@@ -36,6 +37,8 @@ from linebot.models import *
 
 ###global init___>>>
 app = Flask(__name__)
+db = redis.from_url(os.getenv('REDIS_URL', None))
+
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
 if channel_secret is None:
@@ -63,13 +66,12 @@ gss_client = auth_gss_client(auth_json_path, gss_scopes)
 sh = gss_client.open_by_key('1nJHriicxQAZj5i_c8bWAY8OShp7OMLErsz6QKIOs36M')
 
 #wks = sh.get_worksheet(0)
-pdt = []
+db.set('pdt', [])#pdt = []
 wksList = sh.worksheets()
 shopList = [x.title for x in wksList[1:]]
-wks = None
-shopSel = None 
-tRow = None
-init = 0
+db.set('wks', None)#wks = None
+db.set('shopSel', None)#shopSel = None 
+db.set('tRow', None)#tRow = None
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 #PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -80,59 +82,51 @@ picture = ["https://i.imgur.com/qKkE2bj.jpg",
            ]
 ###global init___<<<
 
-
 def get_tRow():
-    global tRow
-    tRow = int(wks.acell('A1').value)
-    return tRow
+    db.set('tRow', int(db.get('wks').acell('A1').value))
+    return db.get('tRow')
 
 def add_1Row():
-    global tRow
     tRow = get_tRow()
     rowData = [tRow+1, 'aaa', 'bbb', 'ccc']
     for i in range(len(rowData)):
-        wks.update_cell(tRow+2, i+1, rowData[i])
+        db.get('wks').update_cell(tRow+2, i+1, rowData[i])
         
 def get_sts():
-    global wksList, wks, pdt, shopSel, init
-    print(init)
-    init = 1
-    print(init)
     content = 'Status Now: \n\n'
     content+= 'wksList: {}\n'.format(wksList)
-    content+= 'wks: {}\n'.format(wks)
-    content+= 'shopSel: {}\n'.format(shopSel)
-    content+= 'pdt: {}\n'.format(pdt[:3])
+    content+= 'wks: {}\n'.format(db.get('wks'))
+    content+= 'shopSel: {}\n'.format(db.get('shopSel'))
+    content+= 'pdt: {}\n'.format(db.get('pdt')[:3])
     return content
         
 def get_sh_tts():
-    global shopList
     content = '店家名單:'
     for s in shopList:
         content += '\n'+s 
     return content
 
 def get_menu():
-    global wks, tRow, pdt
-    tRow = int(wks.acell('A1').value)
-    all_cells = wks.range('A1:B{}'.format(tRow+1))
+    tRow = get_tRow()
+    all_cells = db.get('wks').range('A1:B{}'.format(tRow+1))
 
+    pdt = db.get('pdt')
     for c in all_cells:
         if c.col == 1:
             pdt.append([c.value])
         elif c.col == 2:
             pdt[c.row-1].append(c.value)
-    return pdt
+    db.set('pdt', pdt)
 
 def set_shop(dbdShop):
-    global wks, pdt, shopSel
     shop = dbdShop[3:].strip()
+
     if shop in shopList:
         content = '訂購店家: {}\n'.format(shop)
-        shopSel = shop
-        wks = sh.worksheet("{}".format(shopSel))
+        db.set('shopSel', shop)
+        db.set('wks', sh.worksheet("{}".format(db.get('shopSel'))))
         get_menu()
-        for i in pdt:
+        for i in db.get('pdt'):
             content += '{}: {}\n'.format(i[0], i[1])
     else:
         content = '找不到店家: \"{}\"'.format(shop)
@@ -168,24 +162,18 @@ def handle_message(event):
     event.message.text = event.message.text.strip()
     print("event.reply_token:", event.reply_token)
     print("event.message.text:", event.message.text)
-    if event.message.text == "gtr":
-        get_tRow()
-        content = 'tRow = {}'.format(tRow)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=content))
     if event.message.text == "add1":
         add_1Row()
         content = "add_1Row ok"
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
-    if event.message.text.lower() == "sts":
+    elif event.message.text.lower() == "sts":
         content = get_sts()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
-    if event.message.text.lower() == "dbd":
+    elif event.message.text.lower() == "dbd":
         content = get_sh_tts()
         line_bot_api.reply_message(
             event.reply_token,
