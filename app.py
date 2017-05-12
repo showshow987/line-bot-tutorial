@@ -66,12 +66,12 @@ gss_client = auth_gss_client(auth_json_path, gss_scopes)
 sh = gss_client.open_by_key('1nJHriicxQAZj5i_c8bWAY8OShp7OMLErsz6QKIOs36M')
 
 #wks = sh.get_worksheet(0)
-db.set('pdt', [])#pdt = []
+#db.set('pdt', [])#pdt = []
 wksList = sh.worksheets()
 shopList = [x.title for x in wksList[1:]]
-db.set('wks', None)#wks = None
+#db.set('wks', None)#wks = None
 db.set('shopSel', None)#shopSel = None 
-db.set('tRow', None)#tRow = None
+#db.set('tRow', None)#tRow = None
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 #PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -82,22 +82,22 @@ picture = ["https://i.imgur.com/qKkE2bj.jpg",
            ]
 ###global init___<<<
 
-def get_tRow():
-    db.set('tRow', int(db.get('wks').acell('A1').value))
-    return db.get('tRow')
+def get_tRow(wks):
+    return int(wks.acell('A1').value)
 
+'''
 def add_1Row():
     tRow = get_tRow()
     rowData = [tRow+1, 'aaa', 'bbb', 'ccc']
     for i in range(len(rowData)):
         db.get('wks').update_cell(tRow+2, i+1, rowData[i])
-        
+'''     
 def get_sts():
     content = 'Status Now: \n\n'
     content+= 'wksList: {}\n'.format(wksList)
-    content+= 'wks: {}\n'.format(db.get('wks'))
+    #content+= 'wks: {}\n'.format(db.get('wks'))
     content+= 'shopSel: {}\n'.format(db.get('shopSel'))
-    content+= 'pdt: {}\n'.format(db.get('pdt')[:3])
+    #content+= 'pdt: {}\n'.format(db.get('pdt')[:3])
     return content
         
 def get_sh_tts():
@@ -106,17 +106,17 @@ def get_sh_tts():
         content += '\n'+s 
     return content
 
-def get_menu():
-    tRow = get_tRow()
-    all_cells = db.get('wks').range('A1:B{}'.format(tRow+1))
+def get_menu(wks):
+    tRow = get_tRow(wks)
+    all_cells = wks.range('A1:B{}'.format(tRow+1))
 
-    pdt = db.get('pdt')
+    pdt = []
     for c in all_cells:
         if c.col == 1:
             pdt.append([c.value])
         elif c.col == 2:
             pdt[c.row-1].append(c.value)
-    db.set('pdt', pdt)
+    return pdt
 
 def set_shop(dbdShop):
     shop = dbdShop[3:].strip()
@@ -124,9 +124,9 @@ def set_shop(dbdShop):
     if shop in shopList:
         content = '訂購店家: {}\n'.format(shop)
         db.set('shopSel', shop)
-        db.set('wks', sh.worksheet("{}".format(db.get('shopSel'))))
-        get_menu()
-        for i in db.get('pdt'):
+        wks = sh.worksheet("{}".format(db.get('shopSel')))
+        pdt = get_menu(wks)
+        for i in pdt:
             content += '{}: {}\n'.format(i[0], i[1])
     else:
         content = '找不到店家: \"{}\"'.format(shop)
