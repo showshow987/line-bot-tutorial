@@ -65,6 +65,7 @@ def add_1Row():
         wks.update_cell(tRow+2, i+1, rowData[i])
         
 def get_sts():
+    global wksList, wks, shopSel, pdt
     content = 'Status Now: \n\n'
     content+= 'wksList: {}\n'.format(wksList)
     content+= 'wks: {}\n'.format(wks)
