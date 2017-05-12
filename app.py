@@ -64,6 +64,14 @@ def add_1Row():
     for i in range(len(rowData)):
         wks.update_cell(tRow+2, i+1, rowData[i])
         
+def get_sts():
+    content = 'Status Now: \n\n'
+    content+= 'wksList: {}\n'.format(wksList)
+    content+= 'wks: {}\n'.format(wks)
+    content+= 'shopSel: {}\n'.format(shopSel)
+    content+= 'pdt: {}\n'.format(pdt[:3])
+    return content
+        
 def get_sh_tts():
     global shopList
     content = '店家名單:'
@@ -519,6 +527,12 @@ def handle_message(event):
     if event.message.text == "add1":
         add_1Row()
         content = "add_1Row ok"
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+    if event.message.text.lower() == "sts":
+        content = get_sts()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
