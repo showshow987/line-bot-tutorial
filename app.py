@@ -42,9 +42,15 @@ gss_client = auth_gss_client(auth_json_path, gss_scopes)
 #sheet = gss_client.open("Copy of Legislators 2017").sheet1
 sh = gss_client.open_by_key('1nJHriicxQAZj5i_c8bWAY8OShp7OMLErsz6QKIOs36M')
 
-wks = sh.get_worksheet(0)
-
+#global init---vvv---
+#wks = sh.get_worksheet(0)
+pdt = []
+wksList = sh.worksheets()
+shopList = [x.title for x in wksList[1:]]
+wks = None
+shopSel = None
 tRow = None
+#global init---^^^---
 
 def get_tRow():
     global tRow
@@ -58,6 +64,40 @@ def add_1Row():
     for i in range(len(rowData)):
         wks.update_cell(tRow+2, i+1, rowData[i])
         
+def get_sh_tts():
+    global shopList
+    content = '店家名單:'
+    for s in shopList:
+        content += '\n'+s 
+    return content
+
+def get_menu():
+    global wks, tRow, pdt
+    tRow = int(wks.acell('A1').value)
+    all_cells = wks.range('A1:B{}'.format(tRow+1))
+
+    for c in all_cells:
+        if c.col == 1:
+            pdt.append([c.value])
+        elif c.col == 2:
+            pdt[c.row-1].append(c.value)
+    return pdt
+
+def set_shop(dbdShop):
+    global wks, shopSel, pdt
+    shop = dbdShop[3:].strip()
+    if shop in shopList:
+        content = '訂購店家: {}\n'.format(shop)
+        shopSel = shop
+        wks = sh.worksheet("{}".format(shopSel))
+        get_menu()
+        for i in pdt:
+            content += '{}: {}\n'.format(i[0], i[1])
+    else:
+        content = '找不到店家: \"{}\"'.format(shop)
+        content+= '\n請輸入店家名稱:'
+    return content
+    
 '''
 database_url = os.getenv('DATABASE_URL', None)
 if database_url is None:
@@ -466,6 +506,7 @@ def getMenu():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # cmd = defaultdict(default_factory, command)
+    event.message.text = event.message.text.strip()
     print("event.reply_token:", event.reply_token)
     print("event.message.text:", event.message.text)
     if event.message.text == "gtr":
@@ -482,13 +523,19 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content))
         return 0
-    if event.message.text == "cot":
-        create_order_table()
-        content = "cot Okkk"
+    if event.message.text == "dbd":
+        content = get_sh_tts()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
         return 0
+    elif re.match("dbd", event.message.text, flags=re.IGNORECASE):
+        content = set_shop(event.message.text)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+        
     if event.message.text == "menu":
         content = getMenu()
         try:
