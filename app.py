@@ -96,7 +96,7 @@ def get_sts():
     content = 'Status Now: \n\n'
     content+= 'wksList: {}\n'.format(wksList)
     content+= 'wks: {}\n'.format(db.get('wks'))
-    content+= 'shopSel: {}\n'.format(db.get('shopSel'))
+    content+= 'shopSel: {}\n'.format(db.get('shopSel').decode('big5'))
     content+= 'pdt: {}\n'.format(db.get('pdt')[:3])
     return content
         
