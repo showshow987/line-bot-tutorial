@@ -67,7 +67,7 @@ pdt = []
 wksList = sh.worksheets()
 shopList = [x.title for x in wksList[1:]]
 wks = None
-g.shopSel = None 
+shopSel = None 
 tRow = None
 
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -94,11 +94,11 @@ def add_1Row():
         wks.update_cell(tRow+2, i+1, rowData[i])
         
 def get_sts():
-    global wksList, wks, pdt
+    global wksList, wks, pdt, shopSel
     content = 'Status Now: \n\n'
     content+= 'wksList: {}\n'.format(wksList)
     content+= 'wks: {}\n'.format(wks)
-    content+= 'shopSel: {}\n'.format(g.shopSel)
+    content+= 'shopSel: {}\n'.format(shopSel)
     content+= 'pdt: {}\n'.format(pdt[:3])
     return content
         
@@ -122,12 +122,12 @@ def get_menu():
     return pdt
 
 def set_shop(dbdShop):
-    global wks, pdt
+    global wks, pdt, shopSel
     shop = dbdShop[3:].strip()
     if shop in shopList:
         content = '訂購店家: {}\n'.format(shop)
-        g.shopSel = shop
-        wks = sh.worksheet("{}".format(g.shopSel))
+        shopSel = shop
+        wks = sh.worksheet("{}".format(shopSel))
         get_menu()
         for i in pdt:
             content += '{}: {}\n'.format(i[0], i[1])
