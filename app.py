@@ -35,6 +35,16 @@ from linebot.exceptions import (
 from linebot.models import *
 
 app = Flask(__name__)
+channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
+channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
+if channel_secret is None:
+    print('Specify LINE_CHANNEL_SECRET as environment variable.')
+    sys.exit(1)
+if channel_access_token is None:
+    print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
+    sys.exit(1)
+handler = WebhookHandler(channel_secret)
+line_bot_api = LineBotApi(channel_access_token)
 
 ###conn to google drive___>>>
 def auth_gss_client(path, scopes):
@@ -200,18 +210,6 @@ wks = None
 shopSel = None
 tRow = None
 
-
-channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
-channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
-if channel_secret is None:
-    print('Specify LINE_CHANNEL_SECRET as environment variable.')
-    sys.exit(1)
-if channel_access_token is None:
-    print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
-    sys.exit(1)
-handler = WebhookHandler(channel_secret)
-line_bot_api = LineBotApi(channel_access_token)
-
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -221,7 +219,6 @@ picture = ["https://i.imgur.com/qKkE2bj.jpg",
            "https://i.imgur.com/AjxWcuY.jpg"
            ]
 ###global init___<<<
-
 
 if __name__ == '__main__':
     app.run()
