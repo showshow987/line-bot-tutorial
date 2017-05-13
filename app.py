@@ -129,12 +129,12 @@ def set_shop(dbdShop):
 def get_user(uid):
     profile = line_bot_api.get_profile(uid)
     content = ''
-    '''
+
     content+= profile.display_name+'\n'
     content+= profile.user_id+'\n'
     content+= profile.picture_url+'\n'
     content+= profile.status_message
-    '''
+
     print(profile.display_name)
     print(profile.user_id)
     print(profile.picture_url)
