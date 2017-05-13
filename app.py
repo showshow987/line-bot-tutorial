@@ -130,10 +130,10 @@ def get_user(uid):
     profile = line_bot_api.get_profile(uid)
     content = ''
 
-    content+= profile.display_name+'\n'
-    content+= profile.user_id+'\n'
-    content+= profile.picture_url+'\n'
-    content+= profile.status_message
+    content+= str(profile.display_name)+'\n'
+    content+= str(profile.user_id)+'\n'
+    content+= str(profile.picture_url)+'\n'
+    content+= str(profile.status_message)
 
     print(profile.display_name)
     print(profile.user_id)
