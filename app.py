@@ -126,17 +126,22 @@ def set_shop(dbdShop):
         content+= '\n請輸入店家名稱:'
     return content
 
-def get_user(uid):
-    profile = line_bot_api.get_profile(uid)
+def get_user(event):
+    #profile = line_bot_api.get_profile(uid)
     content = ''
+    '''
     content+= profile.display_name+'\n'
     content+= profile.user_id+'\n'
     content+= profile.picture_url+'\n'
     content+= profile.status_message
+    '''
+    print(event)
+    '''
     print(profile.display_name)
     print(profile.user_id)
     print(profile.picture_url)
     print(profile.status_message)
+    '''
     return content
 
 def add_1Row(event):
@@ -182,7 +187,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content))
     elif event.message.text.lower() == "getu":
-        content = get_user(event.source.userId)
+        content = get_user(event)#.source.userId
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
