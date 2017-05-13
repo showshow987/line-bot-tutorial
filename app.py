@@ -86,11 +86,11 @@ def get_tRow(wks):
     return int(wks.acell('A1').value)
    
 def get_sts():
-    content = 'Status Now: \n\n'
+    content = 'Now: \n\n'
     content+= 'wksList: {}\n'.format(wksList)
     #content+= 'wks: {}\n'.format(db.get('wks'))
     content+= 'shopSel: {}\n'.format(db.get('shopSel'))
-    #content+= 'pdt: {}\n'.format(db.get('pdt')[:3])
+    content+= 'status: {}\n'.format(db.get('status'))
     return content
         
 def get_shops():
@@ -121,6 +121,7 @@ def set_shop(dbdShop):
         pdt = get_menu(wks)
         for i in pdt:
             content += '{}: {}\n'.format(i[0], i[1])
+        db.set('status', 'o')#open
     else:
         content = '找不到店家: \"{}\"'.format(shop)
         content+= '\n請輸入店家名稱:'
@@ -185,6 +186,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content))
     elif event.message.text.lower() == "getu":
+        print(event)
         content = get_user(event.source.user_id)#
         line_bot_api.reply_message(
             event.reply_token,
@@ -204,6 +206,12 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
+    elif event.message.text == "收單":
+        db.set('status', 'c')#closed
+        content = '收單 done'
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))  
     else:
         buttons_template = TemplateSendMessage(
             alt_text='Buttons template',
