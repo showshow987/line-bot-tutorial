@@ -70,7 +70,7 @@ sh = gss_client.open_by_key('1nJHriicxQAZj5i_c8bWAY8OShp7OMLErsz6QKIOs36M')
 wksList = sh.worksheets()
 shopList = [x.title for x in wksList[1:]]
 #db.set('wks', None)#wks = None
-db.set('shopSel', None)#shopSel = None 
+#db.set('shopSel', None)#shopSel = None 
 #db.set('tRow', None)#tRow = None
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 #PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -84,14 +84,7 @@ picture = ["https://i.imgur.com/qKkE2bj.jpg",
 
 def get_tRow(wks):
     return int(wks.acell('A1').value)
-
-'''
-def add_1Row():
-    tRow = get_tRow()
-    rowData = [tRow+1, 'aaa', 'bbb', 'ccc']
-    for i in range(len(rowData)):
-        db.get('wks').update_cell(tRow+2, i+1, rowData[i])
-'''     
+   
 def get_sts():
     content = 'Status Now: \n\n'
     content+= 'wksList: {}\n'.format(wksList)
@@ -100,7 +93,7 @@ def get_sts():
     #content+= 'pdt: {}\n'.format(db.get('pdt')[:3])
     return content
         
-def get_sh_tts():
+def get_shops():
     content = '店家名單:'
     for s in shopList:
         content += '\n'+s 
@@ -133,6 +126,26 @@ def set_shop(dbdShop):
         content+= '\n請輸入店家名稱:'
     return content
 
+def get_user(uid):
+    profile = line_bot_api.get_profile(uid)
+    content = ''
+    content+= profile.display_name+'\n'
+    content+= profile.user_id+'\n'
+    content+= profile.picture_url+'\n'
+    content+= profile.status_message
+    print(profile.display_name)
+    print(profile.user_id)
+    print(profile.picture_url)
+    print(profile.status_message)
+    return content
+
+def add_1Row(event):
+    wks = sh.worksheet("{}".format(db.get('shopSel')))
+    tRow = get_tRow(wks)
+    rowData = [tRow+1, 'aaa', 'bbb', 'ccc']
+    for i in range(len(rowData)):
+        db.get('wks').update_cell(tRow+2, i+1, rowData[i])
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -163,8 +176,13 @@ def handle_message(event):
     print("event.reply_token:", event.reply_token)
     print("event.message.text:", event.message.text)
     if event.message.text == "add1":
-        add_1Row()
+        add_1Row(event)
         content = "add_1Row ok"
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+    elif event.message.text.lower() == "getu":
+        content = get_user(event.source.userId)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
@@ -174,7 +192,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content))
     elif event.message.text.lower() == "dbd":
-        content = get_sh_tts()
+        content = get_shops()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
