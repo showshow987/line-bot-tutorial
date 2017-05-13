@@ -185,7 +185,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content))
     elif event.message.text.lower() == "getu":
-        content = get_user(event.source.userId)#
+        content = get_user(event.source.user_id)#
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
