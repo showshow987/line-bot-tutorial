@@ -11,10 +11,13 @@ import requests
 import re
 import random
 import redis
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as bs
 from collections import defaultdict
 from collections import namedtuple
-from flask import Flask, request, abort, g
+from flask import Flask, request, abort
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+# 禁用安全请求警告
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 ###import for google drive___>>>
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -36,6 +39,9 @@ from linebot.exceptions import (
 from linebot.models import *
 
 ###global init___>>>
+# 禁用安全请求警告
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 app = Flask(__name__)
 db = redis.from_url(os.getenv('REDIS_URL', None), decode_responses=True)
 
@@ -143,13 +149,39 @@ def get_user(uid):
 
     return content
 
-def add_1Row(event):
-    wks = sh.worksheet("{}".format(db.get('shopSel')))
-    tRow = get_tRow(wks)
-    rowData = [tRow+1, 'aaa', 'bbb', 'ccc']
-    for i in range(len(rowData)):
-        db.get('wks').update_cell(tRow+2, i+1, rowData[i])
+def gen_url(s):
+    url = 'http://www.vscinemas.com.tw/visPrintShowTimes.aspx?cid={}&visLang=2'.format(s)
+    return url
 
+def get_cinema(soup):
+    cinema = []
+    for item in soup.select('option'):
+        if re.search('新竹', item.text):
+            if not re.search('gold', item.text, flags=re.IGNORECASE):
+                print(item['value'])
+                print(item.text)
+                cinema.append([item['value'], item.text])
+    return cinema
+
+def movie():
+    rs = requests.session()
+    res = rs.get(gen_url(''), verify=False)
+    soup = bs(res.text, 'html.parser')
+    cinema = get_cinema(soup)
+    content = ''
+    
+    for c in cinema:
+        content+=c[1]+'\n'
+        res = rs.get(gen_url(c[0]), verify=False)
+        soup = bs(res.text, 'html.parser')
+        for item in soup.select('.PrintShowTimesFilm'):
+            content+=item.text+'\n'
+            print(item.text)
+        print('--')
+    return content
+
+def showtime():
+    return 'not command'
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -179,9 +211,13 @@ def handle_message(event):
     event.message.text = event.message.text.strip()
     print("event.reply_token:", event.reply_token)
     print("event.message.text:", event.message.text)
-    if event.message.text == "add1":
-        add_1Row(event)
-        content = "add_1Row ok"
+    if event.message.text == "電影":
+        content = movie()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+    elif re.match("時刻", event.message.text, flags=re.IGNORECASE):
+        content = showtime()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
