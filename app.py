@@ -177,11 +177,32 @@ def movie():
         for item in soup.select('.PrintShowTimesFilm'):
             content+=item.text+'\n'
             print(item.text)
+        content+='--\n'
         print('--')
     return content
 
-def showtime():
-    return 'not command'
+def showtime(m):
+    rs = requests.session()
+    res = rs.get(gen_url(''), verify=False)
+    soup = bs(res.text, 'html.parser')
+    cinema = get_cinema(soup)
+    content = ''
+    m = m[2:].strip()#'冠軍'#input('想看哪一部:')
+    for c in cinema:
+        res = rs.get(gen_url(c[0]), verify=False)
+        soup = bs(res.text, 'html.parser')
+        for item in soup.select('table')[1:]:
+            if re.search(m, item.text):
+                content+=c[1]+'\n'
+                print(c[1])
+                text = re.sub('(\d{2}月\d{2}日)', '\n\g<1>', item.text)
+                text = re.sub('(\d{2}:\d{2})(\d{2})', '\g<1>\n\g<2>', text)
+                text = re.sub('\xa0', ' ', text)
+                content+=text
+                print(text)
+        content+='--\n'
+        print('--')
+    return content
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -211,12 +232,12 @@ def handle_message(event):
     event.message.text = event.message.text.strip()
     print("event.reply_token:", event.reply_token)
     print("event.message.text:", event.message.text)
-    if event.message.text == "電影":
+    if event.message.text.lower() == "movie":
         content = movie()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
-    elif re.match("時刻", event.message.text, flags=re.IGNORECASE):
+    elif re.match("tt", event.message.text, flags=re.IGNORECASE):
         content = showtime()
         line_bot_api.reply_message(
             event.reply_token,
