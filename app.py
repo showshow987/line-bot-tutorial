@@ -238,7 +238,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content))
     elif re.match("tt", event.message.text, flags=re.IGNORECASE):
-        content = showtime()
+        content = showtime(event.message.text)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
