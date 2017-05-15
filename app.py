@@ -22,8 +22,9 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from PyQt5.QtCore import QUrl
-from PyQt5.QtWebKitWidgets import QWebPage
+#from PyQt5.QtWebKitWidgets import QWebPage
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWebEngineWidgets import QWebEnginePage
 '''
 import psycopg2
 from urllib.parse import urlparse
@@ -90,13 +91,13 @@ picture = ["https://i.imgur.com/qKkE2bj.jpg",
            "https://i.imgur.com/AjxWcuY.jpg"
            ]
 ###global init___<<<
-class Render(QWebPage):
+class Render(QWebEnginePage):
     """Render HTML with PyQt5 WebKit."""
 
     def __init__(self, url):
         self.html = None
         self.app = QApplication(sys.argv)
-        QWebPage.__init__(self)
+        QWebEnginePage.__init__(self)
         self.loadFinished.connect(self._loadFinished)
         #self.mainFrame().setHtml(html)
         self.mainFrame().load(QUrl(url))
