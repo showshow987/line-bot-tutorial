@@ -16,8 +16,6 @@ from collections import defaultdict
 from collections import namedtuple
 from flask import Flask, request, abort
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-# 禁用安全请求警告
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 ###import for google drive___>>>
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -39,6 +37,17 @@ from linebot.exceptions import (
 from linebot.models import *
 
 ###global init___>>>
+from selenium import webdriver
+
+phantomjs_path = os.getenv('PHANTOMJS_PATH', None)
+phantomjs_path+="/phantomjs"
+print(phantomjs_path)
+driver = webdriver.PhantomJS(executable_path=phantomjs_path)  # PhantomJs
+driver.get('http://pala.tw/js-example/')  # 輸入範例網址，交給瀏覽器 
+pageSource = driver.page_source  # 取得網頁原始碼
+print(pageSource)
+driver.close()  # 關閉瀏覽器
+
 # 禁用安全请求警告
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
