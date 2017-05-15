@@ -182,14 +182,16 @@ def movie():
     return content
 
 def showtime(m):
+    m = m[2:].strip()#'冠軍'#input('想看哪一部:')
+    if (not m) or m.isdigit():
+        return '請加上電影關鍵字\n'
+    
     rs = requests.session()
     res = rs.get(gen_url(''), verify=False)
     soup = bs(res.text, 'html.parser')
     cinema = get_cinema(soup)
     content = ''
-    m = m[2:].strip()#'冠軍'#input('想看哪一部:')
-    if not m:
-        return '請加上電影關鍵字:\n'
+
     for c in cinema:
         res = rs.get(gen_url(c[0]), verify=False)
         soup = bs(res.text, 'html.parser')
