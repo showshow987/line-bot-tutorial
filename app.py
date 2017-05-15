@@ -188,20 +188,27 @@ def showtime(m):
     cinema = get_cinema(soup)
     content = ''
     m = m[2:].strip()#'冠軍'#input('想看哪一部:')
+    
     for c in cinema:
         res = rs.get(gen_url(c[0]), verify=False)
         soup = bs(res.text, 'html.parser')
+        found = 0
         for item in soup.select('table')[1:]:
             if re.search(m, item.text):
-                content+=c[1]+'\n'
+                found = 1
+                #content+=c[1]+'\n'
                 print(c[1])
                 text = re.sub('(\d{2}月\d{2}日)', '\n\g<1>', item.text)
                 text = re.sub('(\d{2}:\d{2})(\d{2})', '\g<1>\n\g<2>', text)
                 text = re.sub('\xa0', ' ', text)
-                content+=text
+                content+=text+'\n'
                 print(text)
-        content+='--\n'
-        print('--')
+                
+        if found:
+            content=c[1]+content
+            content+='--\n'
+        else:
+            content=c[1]+'找不到{}\n--\n'.format(m)
     return content
 
 @app.route("/callback", methods=['POST'])
@@ -270,6 +277,8 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content))  
     else:
+        pass
+        '''
         buttons_template = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
@@ -289,6 +298,7 @@ def handle_message(event):
             )
         )
         line_bot_api.reply_message(event.reply_token, buttons_template)
+        '''
     return 0
 
 
