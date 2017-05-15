@@ -195,6 +195,8 @@ def showtime(m):
         found = 0
         for item in soup.select('table')[1:]:
             if re.search(m, item.text):
+                if found==0:
+                    content+=c[1]+'\n'
                 found = 1
                 #content+=c[1]+'\n'
                 print(c[1])
@@ -205,7 +207,6 @@ def showtime(m):
                 print(text)
                 
         if found:
-            content=c[1]+content
             content+='--\n'
         else:
             content=c[1]+'找不到{}\n--\n'.format(m)
