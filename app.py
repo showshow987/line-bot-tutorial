@@ -212,7 +212,7 @@ def showtime(m):
         if found:
             content+='--\n'
         else:
-            content=c[1]+'找不到{}\n--\n'.format(m)
+            content+=c[1]+'找不到: \"{}\"\n--\n'.format(m)
     return content
 
 @app.route("/callback", methods=['POST'])
