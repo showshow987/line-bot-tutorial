@@ -21,6 +21,9 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 ###import for google drive___>>>
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from PyQt5.QtCore import QUrl
+from PyQt5.QtWebKitWidgets import QWebPage
+from PyQt5.QtWidgets import QApplication
 '''
 import psycopg2
 from urllib.parse import urlparse
@@ -87,6 +90,23 @@ picture = ["https://i.imgur.com/qKkE2bj.jpg",
            "https://i.imgur.com/AjxWcuY.jpg"
            ]
 ###global init___<<<
+class Render(QWebPage):
+    """Render HTML with PyQt5 WebKit."""
+
+    def __init__(self, url):
+        self.html = None
+        self.app = QApplication(sys.argv)
+        QWebPage.__init__(self)
+        self.loadFinished.connect(self._loadFinished)
+        #self.mainFrame().setHtml(html)
+        self.mainFrame().load(QUrl(url))
+        self.app.exec_()
+
+    def _loadFinished(self, result):
+        #self.html = self.mainFrame().toHtml()
+        self.frame = self.mainFrame()
+        self.app.quit()
+
 
 def get_tRow(wks):
     return int(wks.acell('A1').value)
@@ -215,6 +235,28 @@ def showtime(m):
             content+=c[1]+'找不到: \"{}\"\n--\n'.format(m)
     return content
 
+def bus():
+    url = 'http://www.e-bus.taipei.gov.tw/newmap/Tw/Map?rid=10842&sec=0'
+
+    r = Render(url)
+    result = r.frame.toHtml()
+    soup = bs(result, 'html.parser')
+    
+    stopName=[]
+    eta=[]
+    for c in soup.select('.stopName'):
+        stopName.append(c.text)
+    for c in soup.select('.eta'):
+        eta.append(c.text)
+        #print(c)
+    zipped = zip(stopName,eta)
+    
+    for i in zipped:
+        print(i)
+    
+    content = 'bus ok'
+    return content
+
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -250,6 +292,11 @@ def handle_message(event):
             TextSendMessage(text=content))
     elif re.match("tt", event.message.text, flags=re.IGNORECASE):
         content = showtime(event.message.text)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+    elif event.message.text.lower() == "bus":
+        content = bus()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
