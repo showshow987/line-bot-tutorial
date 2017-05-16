@@ -249,15 +249,16 @@ def hhst_time(m):
     soup = bs(res.text, 'html.parser')
     found = 0
     for item in soup.select('.item.clearfix'):#[1:]:
-        if re.search(m, item.text):
-            if found==0:
-                content+=cinema+'\n'
-            found = 1
-            for _ in item.select('h4'):
-                content+=_.text+'\n'
-            for _ in item.select('.mtcontainer'):
-                for __ in _.select('.tmt'):
-                    content+=__.text+'\n'
+        #print(item.text)
+        for f in item.select('h4'):
+            if re.search(m, f.text):                
+                if found==0:
+                    content+=cinema+'\n'
+                found = 1
+                content+=f.text+'\n'
+                for _ in item.select('.mtcontainer'):
+                    for __ in _.select('.tmt'):
+                        content+=__.text+'\n'
     if found:
         content+='--\n'
     else:
