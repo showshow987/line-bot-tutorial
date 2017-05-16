@@ -153,8 +153,13 @@ def get_user(uid):
 
     return content
 
-def gen_url(s):
-    url = 'http://www.vscinemas.com.tw/visPrintShowTimes.aspx?cid={}&visLang=2'.format(s)
+def gen_url(c, s):
+    if c == 0:
+        url = 'http://www.vscinemas.com.tw/visPrintShowTimes.aspx?cid={}&visLang=2'.format(s)
+    elif c==1:
+        url = 'https://tw.movies.yahoo.com/theater_result.html/id={}'.format(s)
+    else:
+        url = 'http://www.vscinemas.com.tw/visPrintShowTimes.aspx?cid={}&visLang=2'.format(s)
     return url
 
 def get_cinema(soup):
@@ -169,14 +174,14 @@ def get_cinema(soup):
 
 def vieshow():
     rs = requests.session()
-    res = rs.get(gen_url(''), verify=False)
+    res = rs.get(gen_url(0, ''), verify=False)
     soup = bs(res.text, 'html.parser')
     cinema = get_cinema(soup)
     content = ''
     
     for c in cinema:
         content+=c[1]+'\n'
-        res = rs.get(gen_url(c[0]), verify=False)
+        res = rs.get(gen_url(0, c[0]), verify=False)
         soup = bs(res.text, 'html.parser')
         for item in soup.select('.PrintShowTimesFilm'):
             content+=item.text+'\n'
@@ -191,13 +196,13 @@ def vieshow_time(m):
         return '請加上電影關鍵字\n'
     
     rs = requests.session()
-    res = rs.get(gen_url(''), verify=False)
+    res = rs.get(gen_url(0, ''), verify=False)
     soup = bs(res.text, 'html.parser')
     cinema = get_cinema(soup)
     content = ''
 
     for c in cinema:
-        res = rs.get(gen_url(c[0]), verify=False)
+        res = rs.get(gen_url(0, c[0]), verify=False)
         soup = bs(res.text, 'html.parser')
         found = 0
         for item in soup.select('table')[1:]:
@@ -222,7 +227,7 @@ def hhst():
     content = ''
     content+='欣欣秀泰影城'+'\n'
     rs = requests.session()
-    res = rs.get(gen_url(30), verify=False)
+    res = rs.get(gen_url(1, 30), verify=False)
     soup = bs(res.text, 'html.parser')
 
     for item in soup.select('.item.clearfix'):#[1:]:
@@ -240,7 +245,7 @@ def hhst_time(m):
     content = ''
     cinema = '欣欣秀泰影城'
     rs = requests.session()
-    res = rs.get(gen_url(30), verify=False)
+    res = rs.get(gen_url(1, 30), verify=False)
     soup = bs(res.text, 'html.parser')
     found = 0
     for item in soup.select('.item.clearfix'):#[1:]:
