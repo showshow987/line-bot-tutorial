@@ -192,7 +192,7 @@ def vieshow():
 
 def vieshow_time(m):
     m = m[2:].strip()#'冠軍'#input('想看哪一部:')
-    if (not m) or m.isdigit():
+    if (not m):# or m.isdigit():
         return '請加上電影關鍵字\n'
     
     rs = requests.session()
@@ -240,7 +240,7 @@ def hhst():
 
 def hhst_time(m):
     m = m[2:].strip()#'冠軍'#input('想看哪一部:')
-    if (not m) or m.isdigit():
+    if (not m):# or m.isdigit():
         return '請加上電影關鍵字\n'
     content = ''
     cinema = '欣欣秀泰影城'
