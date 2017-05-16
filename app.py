@@ -199,28 +199,28 @@ def vieshow_time(m):
     res = rs.get(gen_url(0, ''), verify=False)
     soup = bs(res.text, 'html.parser')
     cinema = get_cinema(soup)
+    print (cinema)
     content = ''
-
+    
     for c in cinema:
         res = rs.get(gen_url(0, c[0]), verify=False)
         soup = bs(res.text, 'html.parser')
         found = 0
-        for item in soup.select('table')[1:]:
-            if re.search(m, item.text):
-                if found==0:
-                    content+=c[1]+'\n'
-                found = 1
-                #print(c[1])
-                text = re.sub('(\d{2}月\d{2}日)', '\n\g<1>', item.text)
-                text = re.sub('(\d{2}:\d{2})(\d{2})', '\g<1>\n\g<2>', text)
-                text = re.sub('\xa0', ' ', text)
-                content+=text+'\n'
-                #print(text)
-                
-        if found:
-            content+='--\n'
-        else:
-            content+=c[1]+'找不到: \"{}\"\n--\n'.format(m)
+        for item in soup.select('table'):#[1:]:
+            for _ in item.select('.PrintShowTimesFilm'):
+                #print(_.text)
+                if re.search(m, _.text):
+                    if found==0:
+                        content+=c[1]+'\n'
+                    found = 1
+                    content+=_.text+'\n'
+                    for i,x in enumerate(item.select('.PrintShowTimesDay')):
+                        content+=item.select('.PrintShowTimesDay')[i].text+' '
+                        content+=item.select('.PrintShowTimesSession')[i].text+'\n'
+    if found:
+        content+='--\n'
+    else:
+        content+=c[1]+'找不到: \"{}\"\n--\n'.format(m)
     return content
 
 def hhst():
