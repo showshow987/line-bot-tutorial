@@ -229,7 +229,7 @@ def get_js(url):
 
 def taipei_bus(wayIn):
     print(phantomjs_path)
-    way=0 if wayIn=="車去" else way=1
+    way=0 if wayIn=="車去" else 1
 
     url = 'http://www.e-bus.taipei.gov.tw/newmap/Tw/Map?rid=10842&sec={}'.format(way)
     pageSource = get_js(url)
