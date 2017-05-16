@@ -206,7 +206,7 @@ def vieshow_time(m):
         res = rs.get(gen_url(0, c[0]), verify=False)
         soup = bs(res.text, 'html.parser')
         found = 0
-        for item in soup.select('table'):#[1:]:
+        for item in soup.select('table')[1:]:
             for _ in item.select('.PrintShowTimesFilm'):
                 #print(_.text)
                 if re.search(m, _.text):
