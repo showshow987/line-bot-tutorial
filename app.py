@@ -241,12 +241,11 @@ def taipei_bus(wayIn):
         stopName.append(c.text)
     for c in soup.select('.eta'):
         eta.append(c.text)
-    zipped = zip(stopName,eta)
     
     content = ''
-    for i in zipped:
-        content+=i+'\n'
-    print(content)
+    for i,x in enumerate(stopName):
+        print (stopName[i],eta[i])
+        content+=stopName[i]+':'+eta[i]+'\n'
     return content
 
 @app.route("/callback", methods=['POST'])
