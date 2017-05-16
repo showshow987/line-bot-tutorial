@@ -41,12 +41,7 @@ from selenium import webdriver
 
 phantomjs_path = os.getenv('PHANTOMJS_PATH', None)
 phantomjs_path+="/phantomjs"
-print(phantomjs_path)
-driver = webdriver.PhantomJS(executable_path=phantomjs_path)  # PhantomJs
-driver.get('http://pala.tw/js-example/')  # 輸入範例網址，交給瀏覽器 
-pageSource = driver.page_source  # 取得網頁原始碼
-print(pageSource)
-driver.close()  # 關閉瀏覽器
+
 
 # 禁用安全请求警告
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -224,6 +219,36 @@ def showtime(m):
             content+=c[1]+'找不到: \"{}\"\n--\n'.format(m)
     return content
 
+def get_js(url):
+    driver = webdriver.PhantomJS(executable_path=phantomjs_path)  # PhantomJs
+    driver.get('http://pala.tw/js-example/')  # 輸入範例網址，交給瀏覽器 
+    pageSource = driver.page_source  # 取得網頁原始碼
+    print(pageSource)
+    driver.close()  # 關閉瀏覽器
+    return pageSource
+
+def taipei_bus(wayIn):
+    print(phantomjs_path)
+    way=0 if wayIn=="車去" else way=1
+
+    url = 'http://www.e-bus.taipei.gov.tw/newmap/Tw/Map?rid=10842&sec={}'.format(way)
+    pageSource = get_js(url)
+    soup = bs(pageSource, 'html.parser')
+
+    stopName=[]
+    eta=[]
+    for c in soup.select('.stopName'):
+        stopName.append(c.text)
+    for c in soup.select('.eta'):
+        eta.append(c.text)
+    zipped = zip(stopName,eta)
+    
+    content = ''
+    for i in zipped:
+        content+=i+'\n'
+        print(i)
+    return content
+
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -259,6 +284,11 @@ def handle_message(event):
             TextSendMessage(text=content))
     elif re.match("tt", event.message.text, flags=re.IGNORECASE):
         content = showtime(event.message.text)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+    elif event.message.text == "車去" or event.message.text == "車回":
+        content = taipei_bus(event.message.text)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
