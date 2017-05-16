@@ -167,7 +167,7 @@ def get_cinema(soup):
                 cinema.append([item['value'], item.text])
     return cinema
 
-def movie():
+def vieshow():
     rs = requests.session()
     res = rs.get(gen_url(''), verify=False)
     soup = bs(res.text, 'html.parser')
@@ -180,12 +180,12 @@ def movie():
         soup = bs(res.text, 'html.parser')
         for item in soup.select('.PrintShowTimesFilm'):
             content+=item.text+'\n'
-            print(item.text)
+            #print(item.text)
         content+='--\n'
-        print('--')
+        #print('--')
     return content
 
-def showtime(m):
+def vieshow_time(m):
     m = m[2:].strip()#'冠軍'#input('想看哪一部:')
     if (not m) or m.isdigit():
         return '請加上電影關鍵字\n'
@@ -205,18 +205,58 @@ def showtime(m):
                 if found==0:
                     content+=c[1]+'\n'
                 found = 1
-                #content+=c[1]+'\n'
-                print(c[1])
+                #print(c[1])
                 text = re.sub('(\d{2}月\d{2}日)', '\n\g<1>', item.text)
                 text = re.sub('(\d{2}:\d{2})(\d{2})', '\g<1>\n\g<2>', text)
                 text = re.sub('\xa0', ' ', text)
                 content+=text+'\n'
-                print(text)
+                #print(text)
                 
         if found:
             content+='--\n'
         else:
             content+=c[1]+'找不到: \"{}\"\n--\n'.format(m)
+    return content
+
+def hhst():
+    content = ''
+    content+='欣欣秀泰影城'+'\n'
+    rs = requests.session()
+    res = rs.get(gen_url(30), verify=False)
+    soup = bs(res.text, 'html.parser')
+
+    for item in soup.select('.item.clearfix'):#[1:]:
+        for _ in item.select('h4'):
+            if re.search('電話|地址', _.text):
+                continue
+            else:
+                content+=_.text+'\n'
+    return content
+
+def hhst_time(m):
+    m = m[2:].strip()#'冠軍'#input('想看哪一部:')
+    if (not m) or m.isdigit():
+        return '請加上電影關鍵字\n'
+    content = ''
+    cinema = '欣欣秀泰影城'
+    rs = requests.session()
+    res = rs.get(gen_url(30), verify=False)
+    soup = bs(res.text, 'html.parser')
+    found = 0
+    for item in soup.select('.item.clearfix'):#[1:]:
+        if re.search(m, item.text):
+            if found==0:
+                content+=cinema+'\n'
+            found = 1
+            for _ in item.select('h4'):
+                content+=_.text+'\n'
+            for _ in item.select('.mtcontainer'):
+                for __ in _.select('.tmt'):
+                    content+=__.text+'\n'
+    if found:
+        content+='--\n'
+    else:
+        content+=cinema+'找不到: \"{}\"\n--\n'.format(m)
     return content
 
 def get_js(url):
@@ -276,13 +316,23 @@ def handle_message(event):
     event.message.text = event.message.text.strip()
     print("event.reply_token:", event.reply_token)
     print("event.message.text:", event.message.text)
-    if event.message.text.lower() == "movie":
-        content = movie()
+    if event.message.text.lower() == "vs":
+        content = vieshow()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
-    elif re.match("tt", event.message.text, flags=re.IGNORECASE):
-        content = showtime(event.message.text)
+    elif re.match("vs", event.message.text, flags=re.IGNORECASE):
+        content = vieshow_time(event.message.text)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+    elif event.message.text.lower() == "st":
+        content = hhst()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+    elif re.match("st", event.message.text, flags=re.IGNORECASE):
+        content = hhst_time(event.message.text)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
