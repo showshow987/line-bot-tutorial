@@ -217,10 +217,10 @@ def vieshow_time(m):
                     for i,x in enumerate(item.select('.PrintShowTimesDay')):
                         content+=item.select('.PrintShowTimesDay')[i].text+' '
                         content+=item.select('.PrintShowTimesSession')[i].text+'\n'
-    if found:
-        content+='--\n'
-    else:
-        content+=c[1]+'找不到: \"{}\"\n--\n'.format(m)
+        if found:
+            content+='--\n'
+        else:
+            content+=c[1]+'找不到: \"{}\"\n--\n'.format(m)
     return content
 
 def hhst():
