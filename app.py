@@ -229,7 +229,7 @@ def get_js(url):
 
 def taipei_bus(wayIn):
     print(phantomjs_path)
-    way=0 if wayIn=="車回" else 1
+    way=0 if wayIn=="回家" else 1
 
     url = 'http://www.e-bus.taipei.gov.tw/newmap/Tw/Map?rid=10842&sec={}'.format(way)
     pageSource = get_js(url)
@@ -286,7 +286,7 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
-    elif event.message.text == "車去" or event.message.text == "車回":
+    elif event.message.text == "上班" or event.message.text == "回家":
         content = taipei_bus(event.message.text)
         line_bot_api.reply_message(
             event.reply_token,
