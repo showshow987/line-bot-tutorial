@@ -221,7 +221,7 @@ def showtime(m):
 
 def get_js(url):
     driver = webdriver.PhantomJS(executable_path=phantomjs_path)  # PhantomJs
-    driver.get('http://pala.tw/js-example/')  # 輸入範例網址，交給瀏覽器 
+    driver.get(url)  # 輸入範例網址，交給瀏覽器 
     pageSource = driver.page_source  # 取得網頁原始碼
     print(pageSource)
     driver.close()  # 關閉瀏覽器
@@ -246,7 +246,7 @@ def taipei_bus(wayIn):
     content = ''
     for i in zipped:
         content+=i+'\n'
-        print(i)
+    print(content)
     return content
 
 @app.route("/callback", methods=['POST'])
