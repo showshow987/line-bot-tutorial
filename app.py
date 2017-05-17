@@ -95,6 +95,9 @@ board = {
     '電蝦':'PC_Shopping',
     '八卦':'Gossiping',
     '爐石':'Hearthstone',
+    '科技':'Tech_Job',
+    '天秤':'Libra',
+    '處女':'Virgo',
     'joke':'joke',
     'lol':'LoL',
     'nba':'NBA'
@@ -456,7 +459,7 @@ def handle_message(event):
             TextSendMessage(text=content))
     elif re.match(boardStr, event.message.text, flags=re.IGNORECASE):
         sResult = re.match(boardStr, event.message.text, flags=re.IGNORECASE)
-        b = event.message.text[:sResult.span()[1]]
+        b = event.message.text[:sResult.span()[1]].lower()
         k = event.message.text[sResult.span()[1]:].strip()
         content = ptt(b=board[b], key=k, pushRate=0)
         line_bot_api.reply_message(
