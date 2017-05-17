@@ -90,6 +90,16 @@ picture = ["https://i.imgur.com/qKkE2bj.jpg",
            "https://i.imgur.com/HefBo5o.jpg",
            "https://i.imgur.com/AjxWcuY.jpg"
            ]
+board = {
+    '筆電蝦':'nb-shopping',
+    '電蝦':'PC_Shopping',
+    '八卦':'Gossiping',
+    '爐石':'Hearthstone',
+    'joke':'joke',
+    'lol':'LoL',
+    'nba':'NBA'
+}
+boardStr = '|'.join(list(board))
 ###global init___<<<
 
 def get_tRow(wks):
@@ -294,6 +304,89 @@ def taipei_bus(wayIn):
         content+=stopName[i]+':'+eta[i]+'\n'
     return content
 
+def get_page_number(content):
+    startIndex = content.find('index')
+    endIndex = content.find('.html')
+    pageNumber = content[startIndex + 5: endIndex]
+    return pageNumber
+
+def craw_page(url, pushRate, key, soup):
+    articlePage=[]
+    for r_ent in soup.find_all(class_="r-ent"):
+        try:
+            # 先得到每篇文章的篇url
+            link = r_ent.find('a')['href']
+            # if 'M.1430099938.A.3B7' in link:
+            #     continue
+            commentRate = ""
+            if (link):
+                # 確定得到url再去抓 標題 以及 推文數
+                title = r_ent.find(class_="title").text.strip()
+                if key is not '':
+                    if not re.search(key, title, flags=re.IGNORECASE):
+                        continue
+                rate = r_ent.find(class_="nrec").text
+                URL = 'https://www.ptt.cc' + link
+                if (rate):
+                    commentRate = rate
+                    if rate.find(u'爆') > -1:
+                        commentRate = 100
+                    if rate.find('X') > -1:
+                        commentRate = -1 * int(rate[1])
+                else:
+                    commentRate = 0
+                # 比對推文數
+                if int(commentRate) >= pushRate:
+                    articlePage.append((int(commentRate), URL, title))
+        except:
+            # print u'crawPage function error:',r_ent.find(class_="title").text.strip()
+            # print('本文已被刪除')
+            print('delete')
+    return articlePage
+
+def ptt(b = 'Gossiping', pushRate = 0, key = ''):
+    rs = requests.session()
+    load = {
+        'from': '/bbs/{}/index.html'.format(b),
+        'yes': 'yes'
+    }
+    res = rs.post('https://www.ptt.cc/ask/over18', verify=False, data=load)
+    soup = bs(res.text, 'html.parser')
+    ALLpageURL = soup.select('.btn.wide')[1]['href']
+    startPage = int(get_page_number(ALLpageURL)) + 1
+    if key:
+        pageTerm = 4  # crawler count
+    else:
+        pageTerm = 2
+    
+    indexList = []
+    articleAll = []
+    for page in range(startPage, startPage - pageTerm, -1):
+        pageUrl = 'https://www.ptt.cc/bbs/{}/index'.format(b) + str(page) + '.html'
+        indexList.append(pageUrl)
+
+    # 抓取 文章標題 網址 推文數
+    while indexList:
+        index = indexList.pop()#0
+        res = rs.get(index, verify=False)
+        soup = bs(res.text, 'html.parser')
+        # 如網頁忙線中,則先將網頁加入 index_list 並休息1秒後再連接
+        if (soup.title.text.find('Service Temporarily') > -1):
+            indexList.append(index)
+            # print u'error_URL:',index
+            # time.sleep(1)
+        else:
+            articleAll += craw_page(index, pushRate, key, soup)
+            # print u'OK_URL:', index
+            # time.sleep(0.05)
+    content = ''
+    for index, article in enumerate(articleAll, 0):
+        if index < len(articleAll) - 15:#看最後15項
+            continue
+        data = "[" + str(article[0]) + "]推 " + article[2] + "\n" + article[1] + "\n\n"
+        content += data
+    return content
+
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -347,6 +440,26 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
+    elif event.message.text == "花落":
+        b = board['筆電蝦']
+        k = "thinkpad|lenovo|聯想"
+        content = ptt(b=b, key=k, pushRate=0)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+    elif event.message.text.lower() in list(board):#ptt
+        content = ptt(board[event.message.text.lower()], pushRate=0)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+    elif re.match(boardStr, event.message.text, flags=re.IGNORECASE):
+        sResult = re.match(boardStr, event.message.text, flags=re.IGNORECASE)
+        b = event.message.text[:sResult.span()[1]]
+        k = event.message.text[sResult.span()[1]:].strip()
+        content = ptt(b=board[b], key=k, pushRate=0)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
     elif event.message.text.lower() == "getu":
         print(event)
         content = get_user(event.source.user_id)#
@@ -358,6 +471,7 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
+'''
     elif event.message.text.lower() == "dbd":
         content = get_shops()
         line_bot_api.reply_message(
@@ -374,6 +488,7 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))  
+'''
     else:
         pass
         '''
