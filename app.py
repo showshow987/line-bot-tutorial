@@ -381,10 +381,12 @@ def ptt(b = 'Gossiping', pushRate = 0, key = ''):
             # time.sleep(0.05)
     content = ''
     for index, article in enumerate(articleAll, 0):
-        if index < len(articleAll) - 15:#看最後15項
+        if index < len(articleAll) - 12:#看最後12項
             continue
         data = "[" + str(article[0]) + "]推 " + article[2] + "\n" + article[1] + "\n\n"
         content += data
+    if not content:
+        content = '沒有東西'
     return content
 
 @app.route("/callback", methods=['POST'])
@@ -462,7 +464,12 @@ def handle_message(event):
             TextSendMessage(text=content))
     elif event.message.text.lower() == "getu":
         print(event)
-        content = get_user(event.source.user_id)#
+        if event.source.type == "room":
+            content = event.source.room_id#
+        elif event.source.type == "group":
+            content = event.source.group_id#
+        else:
+            content = get_user(event.source.user_id)#
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
