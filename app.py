@@ -471,24 +471,6 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
-'''
-    elif event.message.text.lower() == "dbd":
-        content = get_shops()
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=content))
-    elif re.match("dbd", event.message.text, flags=re.IGNORECASE):
-        content = set_shop(event.message.text)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=content))
-    elif event.message.text == "收單":
-        db.set('status', 'c')#closed
-        content = '收單 done'
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=content))  
-'''
     else:
         pass
         '''
@@ -514,6 +496,24 @@ def handle_message(event):
         '''
     return 0
 
+'''
+elif event.message.text.lower() == "dbd":
+    content = get_shops()
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=content))
+elif re.match("dbd", event.message.text, flags=re.IGNORECASE):
+    content = set_shop(event.message.text)
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=content))
+elif event.message.text == "收單":
+    db.set('status', 'c')#closed
+    content = '收單 done'
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=content))  
+'''
 
 if __name__ == '__main__':
     app.run()
