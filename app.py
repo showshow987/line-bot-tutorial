@@ -182,6 +182,7 @@ def gen_url(c, s):
         url = 'http://www.vscinemas.com.tw/visPrintShowTimes.aspx?cid={}&visLang=2'.format(s)
     return url
 
+'''
 def get_cinema(soup):
     cinema = []
     for item in soup.select('option'):
@@ -284,6 +285,7 @@ def hhst_time(m):
     else:
         content+=cinema+'找不到: \"{}\"\n--\n'.format(m)
     return content
+'''
 
 def movie(c):
     content = ''
