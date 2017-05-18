@@ -85,11 +85,18 @@ shopList = [x.title for x in wksList[1:]]
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 #PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-picture = ["https://i.imgur.com/qKkE2bj.jpg",
-           "https://i.imgur.com/QjMLPmx.jpg",
-           "https://i.imgur.com/HefBo5o.jpg",
-           "https://i.imgur.com/AjxWcuY.jpg"
-           ]
+picture = [
+    "https://i.imgur.com/qKkE2bj.jpg",
+    "https://i.imgur.com/QjMLPmx.jpg",
+    "https://i.imgur.com/HefBo5o.jpg",
+    "https://i.imgur.com/AjxWcuY.jpg"
+    ]
+cinema = {
+    30: '欣欣秀泰影城',
+    104: '新復珍戲院',
+    102: '新竹大遠百威秀影城',
+    145: '新竹巨城威秀影城',
+    }
 board = {
     '筆電蝦':'nb-shopping',
     '電蝦':'PC_Shopping',
@@ -101,7 +108,7 @@ board = {
     'joke':'joke',
     'lol':'LoL',
     'nba':'NBA'
-}
+    }
 boardStr = '|'.join(list(board))
 ###global init___<<<
 
@@ -278,6 +285,61 @@ def hhst_time(m):
         content+=cinema+'找不到: \"{}\"\n--\n'.format(m)
     return content
 
+def movie(c):
+    content = ''
+    content+=cinema[c]+'\n'
+    rs = requests.session()
+    res = rs.get(gen_url(1, c), verify=False)
+    soup = bs(res.text, 'html.parser')
+
+    for item in soup.select('.item.clearfix'):#[1:]:
+
+        for f in item.select('h4'):
+            if re.search('電話|地址', f.text):
+                continue
+            #else:
+            content+=f.text#+'\n'
+            for _ in item.select('img'):
+                sr = re.search('icon_(\w*)\.gif', _['src'])
+                if sr:
+                    content+= ' ' + sr.group(1)[:4].upper()
+            content+='\n'
+    content+='--\n'
+    return content
+
+def movie_time(c, m):
+    m = m[2:].strip()#'冠軍'#input('想看哪一部:')
+    if (not m):# or m.isdigit():
+        return '請加上電影關鍵字\n'
+    content = ''
+    rs = requests.session()
+    res = rs.get(gen_url(1, c), verify=False)
+    soup = bs(res.text, 'html.parser')
+    found = 0
+    for item in soup.select('.item.clearfix'):#[1:]:
+        for f in item.select('h4'):
+            if re.search('電話|地址', f.text):
+                continue
+            if re.search(m, f.text):                
+                if found==0:
+                    content+=cinema[c]+'\n'
+                found = 1
+                content+=f.text#+'\n'
+                for _ in item.select('img'):
+                    sr = re.search('icon_(\w*)\.gif', _['src'])
+                    if sr:
+                        content+= ' ' + sr.group(1)[:4].upper()
+                content+='\n'
+                for _ in item.select('.mtcontainer'):
+                    for __ in _.select('.tmt'):
+                        content+=__.text+'\n'
+    if found:
+        content+='--\n'
+    else:
+        content+=cinema[c]+'找不到: \"{}\"\n--\n'.format(m)
+    return content
+
+
 def get_js(url):
     driver = webdriver.PhantomJS(executable_path=phantomjs_path)  # PhantomJs
     driver.get(url)  # 輸入範例網址，交給瀏覽器 
@@ -425,22 +487,28 @@ def handle_message(event):
     print("event.reply_token:", event.reply_token)
     print("event.message.text:", event.message.text)
     if event.message.text.lower() == "vs":
-        content = vieshow()
+        #content = vieshow()
+        content = movie(102)
+        content+= movie(145)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
     elif re.match("vs", event.message.text, flags=re.IGNORECASE):
-        content = vieshow_time(event.message.text)
+        #content = vieshow_time(event.message.text)
+        content = movie_time(102, event.message.text)
+        content+= movie_time(145, event.message.text)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
     elif event.message.text.lower() == "st":
-        content = hhst()
+        #content = hhst()
+        content = movie(30)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
     elif re.match("st", event.message.text, flags=re.IGNORECASE):
-        content = hhst_time(event.message.text)
+        #content = hhst_time(event.message.text)
+        content = movie_time(30, event.message.text)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
