@@ -339,12 +339,13 @@ def craw_page(url, pushRate, key, soup):
                 else:
                     commentRate = 0
                 # 比對推文數
-                if int(commentRate) >= pushRate:
+                if int(commentRate) >= pushRate or pushRate == 0:
                     articlePage.append((int(commentRate), URL, title))
         except:
             # print u'crawPage function error:',r_ent.find(class_="title").text.strip()
             # print('本文已被刪除')
             print('delete')
+    articlePage.reverse()
     return articlePage
 
 def ptt(b = 'Gossiping', pushRate = 0, key = ''):
@@ -358,19 +359,20 @@ def ptt(b = 'Gossiping', pushRate = 0, key = ''):
     ALLpageURL = soup.select('.btn.wide')[1]['href']
     startPage = int(get_page_number(ALLpageURL)) + 1
     if key:
-        pageTerm = 4  # crawler count
+        pageTerm = 6  # crawler count
     else:
         pageTerm = 2
     
     indexList = []
     articleAll = []
+    resultNum = 12
     for page in range(startPage, startPage - pageTerm, -1):
         pageUrl = 'https://www.ptt.cc/bbs/{}/index'.format(b) + str(page) + '.html'
         indexList.append(pageUrl)
 
     # 抓取 文章標題 網址 推文數
     while indexList:
-        index = indexList.pop()#0
+        index = indexList.pop(0)#0
         res = rs.get(index, verify=False)
         soup = bs(res.text, 'html.parser')
         # 如網頁忙線中,則先將網頁加入 index_list 並休息1秒後再連接
@@ -380,14 +382,16 @@ def ptt(b = 'Gossiping', pushRate = 0, key = ''):
             # time.sleep(1)
         else:
             articleAll += craw_page(index, pushRate, key, soup)
+            if len(articleAll) >= resultNum:
+                break
             # print u'OK_URL:', index
             # time.sleep(0.05)
     content = ''
     for index, article in enumerate(articleAll, 0):
-        if index < len(articleAll) - 12:#看最後12項
-            continue
+        if index >= resultNum:#看最後12項
+            break#continue
         data = "[" + str(article[0]) + "]推 " + article[2] + "\n" + article[1] + "\n\n"
-        content += data
+        content = data + content
     if not content:
         content = '沒有東西'
     return content
