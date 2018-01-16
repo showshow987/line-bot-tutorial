@@ -529,7 +529,7 @@ def handle_message(event):
             TextSendMessage(text=content))
     elif event.message.text == "挖" or event.message.text == "礦" or event.message.text == "挖礦":
         b = board['HW']
-        k = re.compile(r'賣.*(1070|1080)')
+        k = r'賣.*(1070|1080)'
         #k = "1070|1080"
         content = ptt(b=b, key=k, pushRate=0)
         line_bot_api.reply_message(
