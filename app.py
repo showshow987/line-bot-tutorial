@@ -107,7 +107,8 @@ board = {
     '處女':'Virgo',
     'joke':'joke',
     'lol':'LoL',
-    'nba':'NBA'
+    'nba':'NBA',
+    'HW':'HardwareSale'
     }
 boardStr = '|'.join(list(board))
 ###global init___<<<
@@ -522,6 +523,13 @@ def handle_message(event):
     elif event.message.text == "花落":
         b = board['筆電蝦']
         k = "thinkpad|lenovo|聯想"
+        content = ptt(b=b, key=k, pushRate=0)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+    elif event.message.text == "挖" or event.message.text == "礦" or event.message.text == "挖礦":
+        b = board['HW']
+        k = "1070|1080"
         content = ptt(b=b, key=k, pushRate=0)
         line_bot_api.reply_message(
             event.reply_token,
